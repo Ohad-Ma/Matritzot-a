@@ -17,25 +17,37 @@ using namespace zich;
 double WholeNumberGenerator(bool type);
 double FractionGenerator(bool type);
 
-/**
- * @brief Can a matrix have negative rows and cols?
- * 
- */
-TEST_CASE("Negative Integer Rows & Cols"){
+
+TEST_CASE("valdiates rows and cols"){
     srand(time(NULL));
     // Declare & initialize variables - 
     double num_a = WholeNumberGenerator(true);
     double num_b = WholeNumberGenerator(false);
     double num_c = WholeNumberGenerator(true);
     double num_d = WholeNumberGenerator(false);
-    // Trying to create Matrice objects using the numbers above
-    CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},(int)num_b,3));             // Just rows
-    CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},3,(int)num_b));             // Just cols
-    CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},(int)num_b,(int)num_b));    // Both rows and cols are same negative number
-    CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},(int)num_b,(int)num_d));    // Both rows and cols are different negative number
 
+    /**
+     * @brief Can a matrix have negative rows and cols?
+     * 
+     */
+    SUBCASE("Negative Integer Rows & Cols"){
+        // Trying to create Matrice objects using the numbers above
+        CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},(int)num_b,3));             // Just rows
+        CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},3,(int)num_b));             // Just cols
+        CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},(int)num_b,(int)num_b));    // Both rows and cols are same negative number
+        CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},(int)num_b,(int)num_d));    // Both rows and cols are different negative number
+
+    }
+
+    /**
+     * @brief Validates that the amount of rows and cols equals the amount of numbers within the matrix
+     * 
+     */
+    SUBCASE("Validates that the amount of row and col equals to the amount of numbers within the vector"){
+        CHECK_THROWS(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},num_a,num_a));
+        CHECK_NOTHROW(Matrix a({num_a, num_b, num_c, num_d, num_a, num_d, num_d, num_d, num_b},3,3));
+    }
 }
-
 /**
  * @brief Many checks for arithmetic operators with subchecks 
  * 
@@ -266,18 +278,31 @@ TEST_CASE("Increment & Decrement"){
  * 
  */
 TEST_CASE("Boolean cases"){
+    double num = WholeNumberGenerator(true);
     Matrix specific_a({1, 0, 0, 0, 1, 0, 0, 0, 1},3,3);
     Matrix specific_d({1, 0, 0, 0, 1, 0, 0, 0, 1},3,3);
     Matrix specific_b({0, 2, 0, 0, 2, 0, 0, 2, 0},3,3);
     Matrix specific_c({0, 0, 3, 0, 0, 3, 0, 0, 3},3,3);
+    Matrix d({num, num, num, num, num, num},2,2);
 
-    CHECK_EQ(specific_a <  specific_b, true);
-    CHECK_EQ(specific_c > specific_a, true);
-    CHECK_EQ(specific_a <= specific_b, true);
-    CHECK_EQ(specific_a >= specific_a, true);
-    CHECK_EQ(specific_a == specific_d, true);
-    CHECK_NE(specific_a == specific_b, true);
-    CHECK_EQ(specific_a != specific_b, true);
+
+    CHECK_NOTHROW(CHECK_EQ(specific_a <  specific_b, true));
+    CHECK_NOTHROW(CHECK_EQ(specific_c > specific_a, true));
+    CHECK_NOTHROW(CHECK_EQ(specific_a <= specific_b, true));
+    CHECK_NOTHROW(CHECK_EQ(specific_a >= specific_a, true));
+    CHECK_NOTHROW(CHECK_EQ(specific_a == specific_d, true));
+    CHECK_NOTHROW(CHECK_NE(specific_a == specific_b, true));
+    CHECK_NOTHROW(CHECK_EQ(specific_a != specific_b, true));
+
+
+    // Matrice with different dimensions should throw an error according to README.md
+    CHECK_THROWS(CHECK_EQ((specific_a <  d),false));
+    CHECK_THROWS(CHECK_EQ((specific_c >  d),true));
+    CHECK_THROWS(CHECK_EQ((specific_a <= d),true));
+    CHECK_THROWS(CHECK_EQ((specific_a >= d), true));
+    CHECK_THROWS(CHECK_EQ((specific_a != d), true));
+    CHECK_THROWS(CHECK_EQ((specific_a == d), true));
+    
 }
 
 /**
